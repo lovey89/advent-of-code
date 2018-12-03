@@ -2,6 +2,9 @@
 
 import sys
 
+def remove_char_at_index(string, index):
+    return string[:index] + string[index+1:]
+
 file = sys.argv[1]
 
 with open(file) as f:
@@ -11,12 +14,11 @@ length_of_list = len(lines)
 length_of_string = len(lines[0])
 
 for i in range(0, length_of_string):
+    modified_lines = [remove_char_at_index(x, i) for x in lines]
     for j in range(0, length_of_list):
-        raw_string0 = lines[j]
-        string0 = raw_string0[:i] + raw_string0[i+1:]
+        string0 = modified_lines[j]
         for k in range(j + 1, length_of_list):
-            raw_string1 = lines[k]
-            string1 = raw_string1[:i] + raw_string1[i+1:]
+            string1 = modified_lines[k]
             if (string0 == string1):
                 print(string0)
                 exit(0)

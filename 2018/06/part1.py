@@ -28,7 +28,10 @@ if __name__ == '__main__':
     _, max_x, _ = max(coordinates, key=operator.itemgetter(1))
     _, _, max_y = max(coordinates, key=operator.itemgetter(2))
 
-    grid = [[(None, None) for y in range(max_y + 1)] for x in range(max_x + 1)]
+    # This is greater than the maximum difference there can be between two points.
+    # If we initialize with this value instead of null we can skip None checks and speed up computations
+    maximum_value = max_x + max_y + 1
+    grid = [[(maximum_value, None) for y in range(max_y + 1)] for x in range(max_x + 1)]
     
     for cid, cx, cy in coordinates:
         x_distance = -cx
@@ -37,7 +40,7 @@ if __name__ == '__main__':
             for y in range(max_y + 1):
                 m_distance = abs(x_distance) + abs(y_distance)
                 current_m_distance = grid[x][y][0]
-                if current_m_distance == None or m_distance < current_m_distance:
+                if m_distance < current_m_distance:
                     grid[x][y] = (m_distance, cid)
                 elif m_distance == current_m_distance:
                     grid[x][y] = (m_distance, -1)

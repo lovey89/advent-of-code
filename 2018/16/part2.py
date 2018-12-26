@@ -53,7 +53,7 @@ def eqrr(regA, regB, regC):
     registers[regC] = int(registers[regA] == registers[regB])
 
 operations = (addr, addi, mulr, muli, banr, bani, borr, bori, setr, seti, gtir, gtri, gtrr, eqir, eqri, eqrr)
-operations_array = [operations[:] for i in range(len(operations))]
+operation_candidate_list = [list(operations) for i in range(len(operations))]
 
 def read_data(file_name):
     with open(file_name) as f:
@@ -70,25 +70,42 @@ def read_data(file_name):
         samples.append((eval(before[1]), eval(after[1]), op_info))
         index += 4
 
-    return samples
+    instructions = []
+    for line in program.splitlines():
+        op, a, b, c = line.split()
+        instructions.append((int(op), int(a), int(b), int(c)))
+
+    return samples, instructions
+
+def set_registers(state):
+    global registers
+    registers = state[:]
 
 def validate_sample_with_operation(start_state, end_state, a, b, c, operation):
-    global registers
-    registers = start_state[:]
+    set_registers(start_state)
     operation(a, b, c)
     return registers == end_state
 
 if __name__ == '__main__':
     file_name = sys.argv[1]
 
-    samples = read_data(file_name)
+    samples, program_instructions = read_data(file_name)
 
     res = 0
     for start_state, end_state, (op, a, b, c) in samples:
-        #[operaration for operation in operations if validate_sample_with_operation]
-        new_valid_ops = [operation for operation in operations_array[op] ]
-        summa = len([1 for operation in operations if validate_sample_with_operation(start_state, end_state, a, b, c, operation)])
-        if summa >= 3:
-            res += 1
+        new_valid_ops = [operation for operation in operation_candidate_list[op] if validate_sample_with_operation(start_state, end_state, a, b, c, operation)]
+        if len(new_valid_ops) == 1:
+            only_op = new_valid_ops[0]
+            for operation_candidates in operation_candidate_list:
+                try: # Sometime we try to remove an already removed element
+                    operation_candidates.remove(only_op)
+                except ValueError:
+                    pass
+        operation_candidate_list[op] = new_valid_ops
 
-    print(res)
+    set_registers([0, 0, 0, 0])
+
+    for op, a, b, c in program_instructions:
+        operation_candidate_list[op][0](a, b, c)
+
+    print(registers[0])

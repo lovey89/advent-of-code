@@ -1,0 +1,34 @@
+# This file is not needed. I started doing this while waiting for the result for part 2
+
+#ip 1
+00: seti 123 0 5      # R5 = 123            # L2:  registers[5] = 123
+01: bani 5 456 5      # R5 = R5 & 456       #      registers[5] &= 456
+02: eqri 5 72 5       # R5 = R5 == 72       #      if registers[5] == 72:
+03: addr 5 1 1        # IP = IP + R5        #        then goto L1
+04: seti 0 0 1        # IP = 0              #        else goto L2
+05: seti 0 7 5        # R5 = 0              # L1:  registers[5] = 0
+06: bori 5 65536 4    # R4 = R5 | 65536     # L11: registers[4] = 65536
+07: seti 13159625 6 5 # R5 = 13159625       #      registers[5] = 13159625
+08: bani 4 255 3      # R3 = R4 & 255       # L10: registers[3] = registers[4] & 255
+09: addr 5 3 5        # R5 = R5 + R3        #      registers[5] += registers[3]
+10: bani 5 16777215 5 # R5 = R5 & 16777215  #      registers[5] &= 16777215
+11: muli 5 65899 5    # R5 = R5 * 65899     #      registers[5] *= 65899
+12: bani 5 16777215 5 # R5 = R5 & 16777215  #      registers[5] &= 16777215
+13: gtir 256 4 3      # R3 = 256 > R4       #      if 256 > registers[4]:
+14: addr 3 1 1        # IP = IP + R3        #        then goto L3
+15: addi 1 1 1        # IP = IP + 1         #        else goto L4
+16: seti 27 9 1       # IP = 27             # L3:  goto L5
+17: seti 0 0 3        # R3 = 0              # L4:  registers[3] = 0
+18: addi 3 1 2        # R2 = R3 + 1         # L9:  registers[2] = registers[3] + 1
+19: muli 2 256 2      # R2 = R2 * 256       #      registers[2] *= 256
+20: gtrr 2 4 2        # R2 = R2 > R4        #      if registers[2] > registers[4]:
+21: addr 2 1 1        # IP = IP + R2        #        then goto L6
+22: addi 1 1 1        # IP = IP + 1         #        else goto L7
+23: seti 25 0 1       # IP = 25             # L6:  goto L8
+24: addi 3 1 3        # R3 = R3 + 1         # L7:  registers[3] += 1
+25: seti 17 4 1       # IP = 17             #      goto L9
+26: setr 3 3 4        # R4 = R3             # L8:  registers[4] = registers[3]
+27: seti 7 5 1        # IP = 7              #      goto L10
+28: eqrr 5 0 3        # R3 = R5 == R0       # L5:  if (R5 == R0)
+29: addr 3 1 1        # IP = IP + R3        #        return
+30: seti 5 6 1        # IP = 5              #      goto L11

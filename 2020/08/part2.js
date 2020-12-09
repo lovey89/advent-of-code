@@ -19,7 +19,7 @@ function execute(program, switchOpIndex) {
   let visited = [];
 
   let pLength = program.length;
-  
+
   while (true) {
     console.log(currentIndex);
 
@@ -29,11 +29,11 @@ function execute(program, switchOpIndex) {
     } else if (currentIndex < 0 || currentIndex >= pLength) {
       return acc;
     }
-  
+
     let currentOp = opArray[currentIndex];
     visited[currentIndex] = true;
     console.log(currentOp);
-  
+
     if ((currentOp.op === 'jmp' && currentIndex === switchOpIndex) || currentOp.op === 'nop') {
       console.log('nop');
       currentIndex++;

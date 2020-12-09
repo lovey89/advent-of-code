@@ -14,7 +14,7 @@ let resultsPerGroup =
       let res = personDatas.reduce((accumulator, currentValue) => {
         return new Set(Array.from(currentValue).filter(x => accumulator.has(x)));
       }, personDatas[0]);
-      
+
       return res.size;
     });
 

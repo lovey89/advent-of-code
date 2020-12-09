@@ -32,7 +32,7 @@ function numberOfBags(bagType) {
   }
 
   let childNodes = bagMap.get(bagType);
-  let result;  
+  let result;
 
   if (childNodes.length == 0) {
     result = 1;
@@ -43,7 +43,7 @@ function numberOfBags(bagType) {
       })
       .reduce((a, b) => a + b, 0) + 1;
   }
-  
+
   resultMap.set(bagType, result);
   return result;
 }

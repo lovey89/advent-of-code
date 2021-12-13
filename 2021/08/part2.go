@@ -81,6 +81,7 @@ func findTrivialNumbers(display *displayInfo, numberMap *[10]segmentSignals) {
 	}
 }
 
+// Number 3 is the only 5 segment number which segments are superset of 1
 func findNumber3(display *displayInfo, numberMap *[10]segmentSignals) {
 	number1 := numberMap[1]
 	for _, segmentSignals := range display.input {
@@ -92,6 +93,7 @@ func findNumber3(display *displayInfo, numberMap *[10]segmentSignals) {
 	}
 }
 
+// Number 9 is the only 6 segment number which segments are superset of 4
 func findNumber9(display *displayInfo, numberMap *[10]segmentSignals) {
 	number4 := numberMap[4]
 	for _, segmentSignals := range display.input {
@@ -103,6 +105,7 @@ func findNumber9(display *displayInfo, numberMap *[10]segmentSignals) {
 	}
 }
 
+// Number 6 is the only 6 segment number which segments is not a superset of 1
 func findNumber6(display *displayInfo, numberMap *[10]segmentSignals) {
 	number1 := numberMap[1]
 	for _, segmentSignals := range display.input {
@@ -114,6 +117,7 @@ func findNumber6(display *displayInfo, numberMap *[10]segmentSignals) {
 	}
 }
 
+// Number 0 is the only 6 segment number left after 6 and 9 have been found
 func findNumber0(display *displayInfo, numberMap *[10]segmentSignals) {
 	for _, segmentSignals := range display.input {
 		if segmentSignals.noOfActiveSignals == 6 &&
@@ -125,6 +129,7 @@ func findNumber0(display *displayInfo, numberMap *[10]segmentSignals) {
 	}
 }
 
+// Number 5 is the only 5 segment number which segments are a subset of 6
 func findNumber5(display *displayInfo, numberMap *[10]segmentSignals) {
 	number6 := numberMap[6]
 	for _, segmentSignals := range display.input {
@@ -136,6 +141,7 @@ func findNumber5(display *displayInfo, numberMap *[10]segmentSignals) {
 	}
 }
 
+// Number 2 is the only 5 segment number left after 3 and 5 have been found
 func findNumber2(display *displayInfo, numberMap *[10]segmentSignals) {
 	for _, segmentSignals := range display.input {
 		if segmentSignals.noOfActiveSignals == 5 &&

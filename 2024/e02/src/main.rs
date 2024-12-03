@@ -15,29 +15,23 @@ fn read_input(filename: &str) -> Vec<Vec<i32>> {
 }
 
 fn report_is_safe(report: &[i32]) -> bool {
-    let mut diff = report[1] - report[0];
+    let ascending = (report[1] - report[0]).signum();
 
     for i in 1..report.len() {
         let new_diff = report[i] - report[i - 1];
         let abs_diff = new_diff.abs();
-        if !(1..=3).contains(&abs_diff) {
+        if !(1..=3).contains(&abs_diff) || new_diff.signum() != ascending {
             return false;
         }
-        if new_diff.is_negative() && diff.is_positive()
-            || new_diff.is_positive() && diff.is_negative()
-        {
-            return false;
-        }
-        diff = new_diff;
     }
     true
 }
 
-fn dampened_report_is_safe(report: &Vec<i32>) -> bool {
+fn dampened_report_is_safe(report: &[i32]) -> bool {
     // Naive approach. Just try all different combinations. No need to try the non-altered report. If it is valid, then
     // it should be valid if we also remove the first element
     for i in 0..report.len() {
-        let mut cloned_report = report.clone();
+        let mut cloned_report = report.to_owned();
         cloned_report.remove(i);
         if report_is_safe(&cloned_report) {
             return true;
@@ -59,7 +53,7 @@ fn part_2() {
     let reports = read_input(INPUT_FILE);
     let filtered_reports: Vec<Vec<i32>> = reports
         .into_iter()
-        .filter(dampened_report_is_safe)
+        .filter(|report| dampened_report_is_safe(report))
         .collect();
     println!("{}", filtered_reports.len());
 }

@@ -102,7 +102,7 @@ fn part_2() {
         }
     }
 
-    println!("{res}")
+    println!("{res}");
 }
 
 fn main() {

@@ -1,4 +1,5 @@
-use std::{collections::HashMap, fs};
+use std::collections::HashMap;
+use std::fs;
 
 const INPUT_FILE: &str = "input.txt";
 
@@ -31,39 +32,66 @@ fn read_input(filename: &str) -> (HashMap<i32, Vec<i32>>, Vec<Vec<i32>>) {
     (rules, updates)
 }
 
-fn pages_value(rules: &HashMap<i32, Vec<i32>>, pages: Vec<i32>) -> i32 {
+fn find_next(rules: &HashMap<i32, Vec<i32>>, pages: &Vec<i32>) -> (usize, i32) {
+    'outer: for (pos, page) in pages.iter().enumerate() {
+        let current_rules = rules.get(page);
+        let Some(current_rules) = current_rules else {
+            continue;
+        };
+        for check_page in pages {
+            if check_page == page {
+                continue;
+            };
+            if !current_rules.contains(check_page) {
+                continue 'outer;
+            }
+        }
+        return (pos, *page);
+    }
+    panic!()
+}
+
+fn faulty_pages_value(rules: &HashMap<i32, Vec<i32>>, mut pages: Vec<i32>) -> (i32, i32) {
+    let no_of_pages = pages.len();
+    let mut current_page = -1;
+    for _ in 0..=(no_of_pages - 1) / 2 {
+        let (pos, next_page) = find_next(rules, &pages);
+        current_page = next_page;
+        pages.remove(pos);
+    }
+    (0, current_page)
+}
+
+fn pages_value(rules: &HashMap<i32, Vec<i32>>, pages: Vec<i32>) -> (i32, i32) {
     let no_of_pages = pages.len();
     for (pos, e) in pages.iter().enumerate() {
         let current_rules = rules.get(e);
         let Some(current_rules) = current_rules else {
             if pos < no_of_pages - 1 {
-                return 0;
+                return faulty_pages_value(rules, pages);
             }
             break;
         };
         for i in &pages[pos + 1..no_of_pages] {
             if !current_rules.contains(i) {
-                return 0;
+                return faulty_pages_value(rules, pages);
             }
         }
     }
-    pages[(no_of_pages - 1) / 2]
-}
-
-fn part_1() {
-    let (rules, updates) = read_input(INPUT_FILE);
-    let res: i32 = updates
-        .into_iter()
-        .map(|pages| pages_value(&rules, pages))
-        .sum();
-    println!("{res}");
-}
-
-fn part_2() {
-    todo!()
+    (pages[(no_of_pages - 1) / 2], 0)
 }
 
 fn main() {
-    part_1();
-    part_2();
+    let (rules, updates) = read_input(INPUT_FILE);
+    let (part_1, part_2): (i32, i32) = updates
+        .into_iter()
+        .map(|pages| pages_value(&rules, pages))
+        .fold(
+            (0, 0),
+            |(sum_valid, sum_faulty), (valid_value, faulty_value)| {
+                (sum_valid + valid_value, sum_faulty + faulty_value)
+            },
+        );
+    println!("{part_1}");
+    println!("{part_2}")
 }

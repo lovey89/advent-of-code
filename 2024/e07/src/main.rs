@@ -1,6 +1,7 @@
 use std::fs;
 
-//const INPUT_FILE: &str = "mini.txt";
+use itertools::Itertools;
+
 const INPUT_FILE: &str = "input.txt";
 
 fn read_input(filename: &str) -> Vec<(u64, Vec<u64>)> {
@@ -21,45 +22,34 @@ fn read_input(filename: &str) -> Vec<(u64, Vec<u64>)> {
         .collect()
 }
 
-fn get_operator_combinations(no_of_operators: u32) -> Vec<Vec<char>> {
-    (0..2u32.pow(no_of_operators))
-        .map(|i| {
-            (0..no_of_operators)
-                .map(|j| i >> j & 1)
-                .map(|b| if b == 0 { '+' } else { '*' })
-                .collect()
-        })
+fn get_operator_combinations(no_of_operators: usize, operator_choises: u32) -> Vec<Vec<u32>> {
+    std::iter::repeat(0..operator_choises)
+        .take(no_of_operators)
+        .multi_cartesian_product()
         .collect()
 }
 
-fn get_operator_combinations_2(no_of_operators: u32, operators: &[char], mut vectors: &Vec<char>) -> Vec<Vec<char>> {
-    // https://stackoverflow.com/questions/75834334/cartesian-product-of-n-ranges
-    (0..2u32.pow(no_of_operators))
-        .map(|i| {
-            (0..no_of_operators)
-                .map(|j| i >> j & 1)
-                .map(|b| if b == 0 { '+' } else { '*' })
-                .collect()
-        })
-        .collect()
-}
-
-fn valid_calibration_result(sum: &u64, values: &[u64]) -> Option<u64> {
-    let no_of_values: u32 = values.len().try_into().unwrap();
+fn valid_calibration_result(sum: &u64, values: &[u64], operator_choises: u32) -> Option<u64> {
+    let no_of_values = values.len();
     let no_of_operators = no_of_values - 1;
-    let operator_combinations: Vec<Vec<char>> = get_operator_combinations(no_of_operators);
+    let operator_combinations: Vec<Vec<u32>> =
+        get_operator_combinations(no_of_operators, operator_choises);
     for operator_combination in operator_combinations {
         let calculated_sum = &values[1..].iter().zip(operator_combination.iter()).fold(
             values[0],
             |calc_sum, (value, op)| {
-                if op == &'+' {
+                if op == &0u32 {
                     calc_sum + value
-                } else {
+                } else if op == &1u32 {
                     calc_sum * value
+                } else {
+                    calc_sum * 10u64.pow(value.ilog10() + 1) + value
                 }
             },
         );
+        //println!("Sum {calculated_sum}");
         if calculated_sum == sum {
+            //println!("Match");
             return Some(*sum);
         }
     }
@@ -70,14 +60,20 @@ fn part_1() {
     let input = read_input(INPUT_FILE);
     let res: u64 = input
         .iter()
-        .filter_map(|(sum, values)| valid_calibration_result(sum, values))
+        .filter_map(|(sum, values)| valid_calibration_result(sum, values, 2))
         .sum();
 
     println!("{res}");
 }
 
 fn part_2() {
-    todo!();
+    let input = read_input(INPUT_FILE);
+    let res: u64 = input
+        .iter()
+        .filter_map(|(sum, values)| valid_calibration_result(sum, values, 3))
+        .sum();
+
+    println!("{res}");
 }
 
 fn main() {

@@ -120,15 +120,11 @@ fn part<T: Insertable>() {
                     if *height != 0 {
                         return 0;
                     }
-                    //get_trailhead_value(&topographic_map, y, x)
-                    //get_trailhead_value2::<Vec<(i32,i32)>>(&topographic_map, y, x)
                     get_trailhead_value::<T>(&topographic_map, y, x)
                 })
                 .collect::<Vec<_>>()
         })
         .sum();
-    //println!("{topographic_map:?}");
-    //let x = get_trailhead_value(&topographic_map, 0, 2);
     println!("{res}");
 }
 

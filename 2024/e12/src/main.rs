@@ -5,7 +5,14 @@ use std::collections::{
 use std::fs;
 
 const INPUT_FILE: &str = "input.txt";
-//const INPUT_FILE: &str = "mini.txt";
+
+struct CheckStatus(bool, bool, bool, bool); // up, down, left, right
+
+impl CheckStatus {
+    fn new() -> Self {
+        CheckStatus(false, false, false, false)
+    }
+}
 
 fn read_input(filename: &str) -> Vec<Vec<char>> {
     fs::read_to_string(filename)
@@ -67,7 +74,188 @@ fn fence_value(group_members: &HashSet<(usize, usize)>) -> usize {
 }
 
 fn fence_sides(group_members: &HashSet<(usize, usize)>) -> usize {
-    todo!();
+    let mut checked_statuses: HashMap<(usize, usize), CheckStatus> = group_members
+        .iter()
+        .map(|o| (*o, CheckStatus::new()))
+        .collect();
+
+    group_members
+        .iter()
+        .map(|(y, x)| {
+            let y = *y;
+            let x = *x;
+            let mut fences = 0;
+            let CheckStatus(
+                mut up_is_checked,
+                mut down_is_checked,
+                mut left_is_checked,
+                mut right_is_checked,
+            ) = checked_statuses.get(&(y, x)).unwrap();
+
+            if !down_is_checked {
+                let lower_y = y + 1;
+                if !group_members.contains(&(lower_y, x)) {
+                    fences += 1;
+                    for x_neighbor in (0..x).rev() {
+                        let Some(CheckStatus(_, n_checked, _, _)) =
+                            checked_statuses.get_mut(&(y, x_neighbor))
+                        else {
+                            break;
+                        };
+                        *n_checked = true;
+                        if group_members.contains(&(lower_y, x_neighbor)) {
+                            break;
+                        };
+                    }
+                    for x_neighbor in x + 1.. {
+                        let Some(CheckStatus(_, n_checked, _, _)) =
+                            checked_statuses.get_mut(&(y, x_neighbor))
+                        else {
+                            break;
+                        };
+                        *n_checked = true;
+                        if group_members.contains(&(lower_y, x_neighbor)) {
+                            break;
+                        };
+                    }
+                }
+                down_is_checked = true;
+            }
+            if !right_is_checked {
+                let right_x = x + 1;
+                if !group_members.contains(&(y, right_x)) {
+                    fences += 1;
+                    for y_neighbor in (0..y).rev() {
+                        let Some(CheckStatus(_, _, _, n_checked)) =
+                            checked_statuses.get_mut(&(y_neighbor, x))
+                        else {
+                            break;
+                        };
+                        *n_checked = true;
+                        if group_members.contains(&(y_neighbor, right_x)) {
+                            break;
+                        };
+                    }
+                    for y_neighbor in y + 1.. {
+                        let Some(CheckStatus(_, _, _, n_checked)) =
+                            checked_statuses.get_mut(&(y_neighbor, x))
+                        else {
+                            break;
+                        };
+                        *n_checked = true;
+                        if group_members.contains(&(y_neighbor, right_x)) {
+                            break;
+                        };
+                    }
+                }
+                right_is_checked = true;
+            }
+            if !up_is_checked {
+                if y == 0 {
+                    fences += 1;
+                    for x_neighbor in (0..x).rev() {
+                        let Some(CheckStatus(n_checked, _, _, _)) =
+                            checked_statuses.get_mut(&(y, x_neighbor))
+                        else {
+                            break;
+                        };
+                        *n_checked = true;
+                    }
+                    for x_neighbor in x + 1.. {
+                        let Some(CheckStatus(n_checked, _, _, _)) =
+                            checked_statuses.get_mut(&(y, x_neighbor))
+                        else {
+                            break;
+                        };
+                        *n_checked = true;
+                    }
+                } else if !group_members.contains(&(y - 1, x)) {
+                    let upper_y = y - 1;
+                    fences += 1;
+                    for x_neighbor in (0..x).rev() {
+                        let Some(CheckStatus(n_checked, _, _, _)) =
+                            checked_statuses.get_mut(&(y, x_neighbor))
+                        else {
+                            break;
+                        };
+                        *n_checked = true;
+                        if group_members.contains(&(upper_y, x_neighbor)) {
+                            break;
+                        };
+                    }
+                    for x_neighbor in x + 1.. {
+                        let Some(CheckStatus(n_checked, _, _, _)) =
+                            checked_statuses.get_mut(&(y, x_neighbor))
+                        else {
+                            break;
+                        };
+                        *n_checked = true;
+                        if group_members.contains(&(upper_y, x_neighbor)) {
+                            break;
+                        };
+                    }
+                }
+                up_is_checked = true;
+            }
+            if !left_is_checked {
+                if x == 0 {
+                    fences += 1;
+                    for y_neighbor in (0..y).rev() {
+                        let Some(CheckStatus(_, _, n_checked, _)) =
+                            checked_statuses.get_mut(&(y_neighbor, x))
+                        else {
+                            break;
+                        };
+                        *n_checked = true;
+                    }
+                    for y_neighbor in y + 1.. {
+                        let Some(CheckStatus(_, _, n_checked, _)) =
+                            checked_statuses.get_mut(&(y_neighbor, x))
+                        else {
+                            break;
+                        };
+                        *n_checked = true;
+                    }
+                } else if !group_members.contains(&(y, x - 1)) {
+                    let left_x = x - 1;
+                    fences += 1;
+                    for y_neighbor in (0..y).rev() {
+                        let Some(CheckStatus(_, _, n_checked, _)) =
+                            checked_statuses.get_mut(&(y_neighbor, x))
+                        else {
+                            break;
+                        };
+                        *n_checked = true;
+                        if group_members.contains(&(y_neighbor, left_x)) {
+                            break;
+                        };
+                    }
+                    for y_neighbor in y + 1.. {
+                        let Some(CheckStatus(_, _, n_checked, _)) =
+                            checked_statuses.get_mut(&(y_neighbor, x))
+                        else {
+                            break;
+                        };
+                        *n_checked = true;
+                        if group_members.contains(&(y_neighbor, left_x)) {
+                            break;
+                        };
+                    }
+                }
+                left_is_checked = true;
+            }
+            checked_statuses.insert(
+                (y, x),
+                CheckStatus(
+                    up_is_checked,
+                    down_is_checked,
+                    left_is_checked,
+                    right_is_checked,
+                ),
+            );
+            fences
+        })
+        .sum()
 }
 
 fn get_groups_and_members() -> HashMap<u32, HashSet<(usize, usize)>> {

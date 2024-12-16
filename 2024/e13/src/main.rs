@@ -1,19 +1,18 @@
 use std::fs;
 
-//const INPUT_FILE: &str = "input.txt";
-const INPUT_FILE: &str = "mini.txt";
+const INPUT_FILE: &str = "input.txt";
 
 #[derive(Debug)]
 struct Machine {
-    a_x: i32,
-    a_y: i32,
-    b_x: i32,
-    b_y: i32,
-    p_x: i32,
-    p_y: i32,
+    a_x: i64,
+    a_y: i64,
+    b_x: i64,
+    b_y: i64,
+    p_x: i64,
+    p_y: i64,
 }
 
-fn get_machine_moves(s: &str) -> (i32, i32) {
+fn get_machine_moves(s: &str) -> (i64, i64) {
     let mut split = s.split_whitespace();
     split.next();
     split.next();
@@ -22,7 +21,7 @@ fn get_machine_moves(s: &str) -> (i32, i32) {
     (x, split.next().unwrap()[2..].parse().unwrap())
 }
 
-fn get_prize_location(s: &str) -> (i32, i32) {
+fn get_prize_location(s: &str) -> (i64, i64) {
     let mut split = s.split_whitespace();
     split.next();
     let x = split.next().unwrap();
@@ -39,43 +38,78 @@ fn read_input(filename: &str) -> Vec<Machine> {
             let (a_x, a_y) = get_machine_moves(lines.next().unwrap());
             let (b_x, b_y) = get_machine_moves(lines.next().unwrap());
             let (p_x, p_y) = get_prize_location(lines.next().unwrap());
-            Machine{a_x, a_y, b_x, b_y, p_x, p_y}
+            Machine {
+                a_x,
+                a_y,
+                b_x,
+                b_y,
+                p_x,
+                p_y,
+            }
         })
         .collect::<Vec<_>>()
 }
 
-fn valid_solution(Machine{a_x, a_y, b_x, b_y, p_x, p_y}: &Machine, a_pushes: i32, b_pushes: i32) -> bool {
+fn valid_solution(
+    Machine {
+        a_x,
+        a_y,
+        b_x,
+        b_y,
+        p_x,
+        p_y,
+    }: &Machine,
+    a_pushes: i64,
+    b_pushes: i64,
+) -> bool {
     if a_x * a_pushes + b_x * b_pushes != *p_x {
         return false;
     }
     a_y * a_pushes + b_y * b_pushes == *p_y
 }
 
-fn find_all_valid_solutions(machine: Machine) -> Vec<(i32, i32)> {
-    let Machine{a_x, a_y, b_x, b_y, p_x, p_y} = machine;
-    let max_a = std::cmp::min(p_x / a_x, 100);
+fn find_best_solution_cost(machine: &Machine) -> Option<i64> {
+    // There should only be at most one solution when solving two unknown in two linear equations
+    let Machine {
+        a_x,
+        a_y,
+        b_x,
+        b_y,
+        p_x,
+        p_y,
+    } = machine;
 
-    let mut solutions = vec![];
-    for a_pushes in (0..=max_a) {
-        let leftover_x = p_x - a_pushes - a_x;
-        let b_pushes = std::cmp::min(leftover_x / b_x, 100);
-        if b_pushes > 100 {
-            continue;
-        }
-        if valid_solution(&machine, a_pushes, b_pushes) {
-            solutions.push((a_pushes, b_pushes));
-        }
-    };
-    solutions
+    // Solve the unknowns
+    let a_pushes = (p_x * b_y - p_y * b_x) / (a_x * b_y - a_y * b_x);
+    let b_pushes = (a_x * p_y - a_y * p_x) / (a_x * b_y - a_y * b_x);
+
+    // Verify the solution since we only work with integers
+    if valid_solution(machine, a_pushes, b_pushes) {
+        return Some(a_pushes * 3 + b_pushes);
+    }
+    None
 }
 
 fn part_1() {
     let machines = read_input(INPUT_FILE);
-    println!("{machines:?}");
+
+    let res: i64 = machines.iter().filter_map(find_best_solution_cost).sum();
+    println!("{res}");
 }
 
 fn part_2() {
-    todo!();
+    let machines = read_input(INPUT_FILE);
+
+    let res: i64 = machines
+        .into_iter()
+        .map(|mut m| {
+            m.p_x += 10000000000000;
+            m.p_y += 10000000000000;
+            m
+        })
+        .filter_map(|m| find_best_solution_cost(&m))
+        .sum();
+    println!("{res}");
 }
 
 fn main() {
